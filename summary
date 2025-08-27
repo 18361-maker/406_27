@@ -1,0 +1,47 @@
+// src/pages/Summary.js
+import { useEffect, useState } from "react";
+import { db, auth } from "../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import SummaryChart from "../components/SummaryChart";
+
+export default function Summary() {
+  const [yesterday, setYesterday] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const q = query(
+        collection(db, "transactions"),
+        where("uid", "==", auth.currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      let data = [];
+      querySnapshot.forEach(doc => data.push(doc.data()));
+      setYesterday(data[data.length - 1]); // mock: ข้อมูลล่าสุดแทนเมื่อวาน
+    };
+    fetchData();
+  }, []);
+
+  return (
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <h2 className="text-xl font-bold text-pink-600">สรุปของเมื่อวาน</h2>
+      {yesterday ? (
+        <>
+          <SummaryChart income={yesterday.income} expense={yesterday.expense}/>
+          <div className="mt-4 bg-white p-4 rounded shadow">
+            <p>รายรับ: {yesterday.income} บาท</p>
+            <p>รายจ่าย: {yesterday.expense} บาท</p>
+            <p>เงินเก็บ: {yesterday.saving} บาท</p>
+            <p>ยอดคงเหลือ: {yesterday.remaining} บาท</p>
+          </div>
+        </>
+      ) : <p>ยังไม่มีข้อมูล</p>}
+      
+      <div className="flex justify-between mt-6">
+        <button onClick={()=>navigate("/add-income")} className="bg-green-400 text-white px-4 py-2 rounded">+ รายรับ</button>
+        <button onClick={()=>navigate("/add-expense")} className="bg-red-400 text-white px-4 py-2 rounded">- รายจ่าย</button>
+      </div>
+    </div>
+  );
+}
