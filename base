@@ -1,0 +1,17 @@
+project/
+│── src/
+│   ├── App.js
+│   ├── index.js
+│   ├── firebase.js           # ตั้งค่า Firebase
+│   ├── pages/
+│   │   ├── Login.js          # หน้า 1
+│   │   ├── Summary.js        # หน้า 2
+│   │   ├── AddIncome.js      # หน้า 3
+│   │   ├── AddExpense.js     # หน้า 4
+│   ├── components/
+│   │   ├── Navbar.js
+│   │   ├── IncomeForm.js
+│   │   ├── ExpenseForm.js
+│   │   └── SummaryChart.js
+│   └── styles.css
+└── package.json
