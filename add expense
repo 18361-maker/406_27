@@ -1,0 +1,53 @@
+// src/pages/AddExpense.js
+import { useState } from "react";
+import { db, auth } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
+const expenseTypes = ["ค่าอาหาร", "ค่าเดินทาง", "ค่าน้ำ", "ค่าไฟ", "ช็อปปิ้ง", "อื่น ๆ"];
+
+export default function AddExpense() {
+  const [type, setType] = useState(expenseTypes[0]);
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const navigate = useNavigate();
+
+  const saveExpense = async () => {
+    const expense = parseFloat(amount);
+    await addDoc(collection(db, "transactions"), {
+      uid: auth.currentUser.uid,
+      type: "expense",
+      category: type,
+      income: 0,
+      expense,
+      saving: 0,
+      remaining: -expense,
+      note,
+      createdAt: new Date()
+    });
+    navigate("/summary");
+  };
+
+  return (
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <h2 className="text-xl font-bold text-pink-600 mb-4">เพิ่มรายจ่าย</h2>
+      
+      <select value={type} onChange={(e)=>setType(e.target.value)} className="p-2 border rounded mb-2 w-full">
+        {expenseTypes.map(t => <option key={t} value={t}>{t}</option>)}
+      </select>
+      <input 
+        type="number" placeholder="จำนวนเงิน" 
+        value={amount} onChange={(e)=>setAmount(e.target.value)}
+        className="p-2 border rounded mb-2 w-full"
+      />
+      <textarea 
+        placeholder="บันทึกเพิ่มเติม (ไม่บังคับ)" 
+        value={note} onChange={(e)=>setNote(e.target.value)}
+        className="p-2 border rounded mb-2 w-full"
+      />
+      <button onClick={saveExpense} className="bg-red-500 text-white px-4 py-2 rounded w-full">
+        บันทึกรายจ่าย
+      </button>
+    </div>
+  );
+}
